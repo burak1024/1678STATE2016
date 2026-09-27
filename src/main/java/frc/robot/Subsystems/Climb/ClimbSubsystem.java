@@ -41,6 +41,12 @@ public class ClimbSubsystem extends Subsystem{
                     () -> climbingEMethods()
             }
     };
+    public void changeState(state newState) {
+        methods[currentState.stateNum][2].run();
+        currentState = newState;
+        methods[currentState.stateNum][0].run();
+        super.activeStatePeriodic = methods[newState.stateNum][1];
+    }
     private void climbingIMethods(){
         solenoid.set(true);
     }

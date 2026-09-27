@@ -1,16 +1,8 @@
-package frc.robot.Subsystems.Shooter;
+package frc.robot.Subsystems.Intake;
 
-import edu.wpi.first.math.interpolation.InterpolatingDoubleTreeMap;
-
-public class shooterConstants {
-    public static InterpolatingDoubleTreeMap shooterVOLTMap(){
-        InterpolatingDoubleTreeMap treeMap  = new InterpolatingDoubleTreeMap();
-        treeMap.put(0.0, 0.0);
-        treeMap.put(1.0, 1.5);
-        treeMap.put(4.0, 12.0);
-        return treeMap;
-    }
-    public static final int SHOOTER_MOTOR_ID=10;
+public class IntakeConstants {
+    public static final int INTAKE_MOTOR_ID1 =11;
+    public static final int INTAKE_MOTOR_ID2 = 12;
     public static final double STATOR_CURRENT_LIMIT = 80.0;
     public static final double CRUISE_VELOCITY = Double.POSITIVE_INFINITY;
     public static final double ACCELERATION = Double.POSITIVE_INFINITY;
@@ -22,3 +14,4 @@ public class shooterConstants {
     public static final double kI=0.01;
     public static final double kD = 0.01;
 }
+

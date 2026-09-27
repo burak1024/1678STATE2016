@@ -8,7 +8,7 @@ import frc.robot.LimelightHelpers;
 import frc.robot.lib.Subsystem;
 
 public class shooterSubsystem extends Subsystem {
-    private final TalonFX shooterMotor = new TalonFX(0);
+    private final TalonFX shooterMotor = new TalonFX(shooterConstants.SHOOTER_MOTOR_ID);
     private final VoltageOut Voltage = new VoltageOut(0).withEnableFOC(true);
     private Pose2d robotPos = LimelightHelpers.getBotPose2d("limelight");
     private static shooterSubsystem instance;
@@ -24,6 +24,10 @@ public class shooterSubsystem extends Subsystem {
         return getInstance();
     }
 
+    public shooterSubsystem() {
+        shooterMotor.getConfigurator().apply(shooterConfig.config());
+    }
+
     private state currentState = state.idle;
 
     public enum state {
@@ -36,36 +40,48 @@ public class shooterSubsystem extends Subsystem {
             this.stateNum = stateNum;
         }
     }
+
     public Runnable[][] methods = {
-        {
-            ()->emptyMethod(),
-            ()->emptyMethod(),
-            ()->emptyMethod()
-        },
-        {
-            ()->shooterIMethods(),
-            ()->shooterPMethods(),
-            ()->shooterEMethods()
-        }
+            {
+                    () -> emptyMethod(),
+                    () -> emptyMethod(),
+                    () -> emptyMethod()
+            },
+            {
+                    () -> shooterIMethods(),
+                    () -> shooterPMethods(),
+                    () -> shooterEMethods()
+            }
     };
-    private double setVoltage(){
+
+    public void changeState(state newState) {
+        methods[currentState.stateNum][2].run();
+        currentState = newState;
+        methods[currentState.stateNum][0].run();
+        super.activeStatePeriodic = methods[newState.stateNum][1];
+    }
+
+    private double setVoltage() {
         double x = robotPos.getX();
         double y = robotPos.getY();
-        double hypot=Math.hypot(x, y);
+        double hypot = Math.hypot(x, y);
         return shooterConstants.shooterVOLTMap().get(hypot);
     }
-    private void setMotor(double voltage){
+
+    private void setMotor(double voltage) {
         shooterMotor.setControl(Voltage.withOutput(voltage));
     }
-    private void shooterIMethods(){
-        setMotor(setVoltage());
-    }   
-    private void shooterPMethods(){
-        setMotor(setVoltage());
-    }   
-    private void shooterEMethods(){
-        setMotor(0);
-    }    
 
+    private void shooterIMethods() {
+        setMotor(setVoltage());
+    }
+
+    private void shooterPMethods() {
+        setMotor(setVoltage());
+    }
+
+    private void shooterEMethods() {
+        setMotor(0);
+    }
 
 }

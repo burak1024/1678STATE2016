@@ -4,24 +4,29 @@ import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.TalonFX;
 import frc.robot.lib.Subsystem;
 
-public class intakeSubsystem extends Subsystem {
-    private final TalonFX intakeMotorR = new TalonFX(0);
-    private final TalonFX intakeMotorL = new TalonFX(0);
+public class IntakeSubsystem extends Subsystem {
+    private final TalonFX intakeMotorR = new TalonFX(IntakeConstants.INTAKE_MOTOR_ID1);
+    private final TalonFX intakeMotorL = new TalonFX(IntakeConstants.INTAKE_MOTOR_ID2);
     private final VoltageOut Voltage = new VoltageOut(0).withEnableFOC(true);
-    private static intakeSubsystem instance;
+    private static IntakeSubsystem instance;
 
-    public intakeSubsystem getInstance() {
+    public static IntakeSubsystem getInstance() {
         if (instance == null) {
-            instance = new intakeSubsystem();
+            instance = new IntakeSubsystem();
         }
         return instance;
     }
 
-    public intakeSubsystem subsystem() {
+    public static IntakeSubsystem subsystem() {
         return getInstance();
     }
 
     private state currentState = state.idle;
+
+    public IntakeSubsystem() {
+        intakeMotorR.getConfigurator().apply(IntakeConfig.config());
+        intakeMotorL.getConfigurator().apply(IntakeConfig.config());
+    }
 
     public enum state {
         idle(0),
@@ -46,6 +51,13 @@ public class intakeSubsystem extends Subsystem {
                     () -> intakingEMethods()
             }
     };
+
+    public void changeState(state newState) {
+        methods[currentState.stateNum][2].run();
+        currentState = newState;
+        methods[currentState.stateNum][0].run();
+        super.activeStatePeriodic = methods[newState.stateNum][1];
+    }
 
     private void intakingIMethods() {
         intakeMotorL.setControl(Voltage.withOutput(3.0));
