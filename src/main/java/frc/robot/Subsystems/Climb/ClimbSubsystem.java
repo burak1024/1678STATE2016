@@ -4,9 +4,18 @@ import edu.wpi.first.wpilibj.PneumaticsModuleType;
 import edu.wpi.first.wpilibj.Solenoid;
 import frc.robot.lib.Subsystem;
 
-public class ClimSubsystem extends Subsystem{
+public class ClimbSubsystem extends Subsystem{
     Solenoid solenoid = new Solenoid(PneumaticsModuleType.CTREPCM, 0);
-    private ClimSubsystem instance;
+    private ClimbSubsystem instance;
+    public ClimbSubsystem getInstance(){
+        if(instance==null){
+            instance= new ClimbSubsystem();
+        }
+        return instance;
+    }
+    public ClimbSubsystem subsystem(){
+        return getInstance();
+    }
 
     private state currentState=state.idle;
     public enum state {
