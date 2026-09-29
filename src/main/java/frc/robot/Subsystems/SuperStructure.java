@@ -1,13 +1,11 @@
 package frc.robot.Subsystems;
 
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.Subsystems.Elevator.elevatorSubsystem;
+import frc.robot.Subsystems.Elevator.ElevatorSubsystem;
 import frc.robot.Subsystems.Intake.IntakeSubsystem;
 import frc.robot.Subsystems.Climb.ClimbSubsystem;
-import frc.robot.Subsystems.Shooter.shooterSubsystem;
+import frc.robot.Subsystems.Shooter.ShooterSubsystem;
 
 public class SuperStructure extends SubsystemBase {
     private static SuperStructure instance;
@@ -27,18 +25,25 @@ public class SuperStructure extends SubsystemBase {
     };
 
     private void idleIMethods() {
-        changeSubsystemStates(IntakeSubsystem.state.idle, ElevatorSubsystem.state.idle, ArmSubsystem.state.idle);
+        changeSubsystemStates(IntakeSubsystem.state.idle, ElevatorSubsystem.state.idle, ShooterSubsystem.state.idle,ClimbSubsystem.state.idle);
     }
 
     private void intakingIMethods() {
-        changeSubsystemStates(IntakeSubsystem.state.intaking, ElevatorSubsystem.state.idle, ArmSubsystem.state.idle);
+        changeSubsystemStates(IntakeSubsystem.state.intaking, ElevatorSubsystem.state.idle, ShooterSubsystem.state.idle,ClimbSubsystem.state.idle);
+    }
+    private void shootingIMethods(){
+        changeSubsystemStates(IntakeSubsystem.state.idle, ElevatorSubsystem.state.shooting, ShooterSubsystem.state.shooting, ClimbSubsystem.state.idle);
+    }
+    private void climbingIMethods(){
+        changeSubsystemStates(IntakeSubsystem.state.idle, ElevatorSubsystem.state.climb, ShooterSubsystem.state.idle, ClimbSubsystem.state.climbing);
     }
 
-    private void changeSubsystemStates(IntakeSubsystem.state intakeState, elevatorSubsystem.state elevatorState,
-            shooterSubsystem.state shooterState, ClimbSubsystem.state climbState) {
-        IntakeSubsystem. ; 
-        elevatorSubsystem.subsystem().changeState(elevatorState);
-
+    private void changeSubsystemStates(IntakeSubsystem.state intakeState, ElevatorSubsystem.state elevatorState,
+        ShooterSubsystem.state shooterState, ClimbSubsystem.state climbState) {
+        IntakeSubsystem.subsystem().changeState(intakeState) ; 
+        ElevatorSubsystem.subsystem().changeState(elevatorState);
+        ShooterSubsystem.getInstance().changeState(shooterState);
+        ClimbSubsystem.subsystem().changeState(climbState);
     }
 
     private state currentState = state.idle;
@@ -66,7 +71,8 @@ public class SuperStructure extends SubsystemBase {
     public SuperStructure() {
         IntakeSubsystem.subsystem();
         ElevatorSubsystem.subsystem();
-        shooterSubsystem.
+        ShooterSubsystem.subsystem();
+        ClimbSubsystem.subsystem();
     }
 
     public void changeState(state newState) {
@@ -75,10 +81,6 @@ public class SuperStructure extends SubsystemBase {
         currentState = newState;
         methods[currentState.stateNum].run();
         SmartDashboard.putNumber("ActiveState", currentState.stateNum);
-    }
-
-    public static Command pull() {
-        return new InstantCommand(() -> SuperStructure.getInstance().changeState(SuperStructure.state.pulling));
     }
 
 }

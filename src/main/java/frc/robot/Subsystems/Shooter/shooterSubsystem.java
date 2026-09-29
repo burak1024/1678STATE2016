@@ -4,27 +4,32 @@ import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.TalonFX;
 
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import frc.robot.LimelightHelpers;
+import frc.robot.Subsystems.Elevator.elevatorConstants;
 import frc.robot.lib.Subsystem;
 
-public class shooterSubsystem extends Subsystem {
+public class ShooterSubsystem extends Subsystem {
     private final TalonFX shooterMotor = new TalonFX(shooterConstants.SHOOTER_MOTOR_ID);
     private final VoltageOut Voltage = new VoltageOut(0).withEnableFOC(true);
     private Pose2d robotPos = LimelightHelpers.getBotPose2d("limelight");
-    private static shooterSubsystem instance;
+    private static ShooterSubsystem instance;
+    private Translation2d targetPos;
 
-    public static shooterSubsystem getInstance() {
+    public static ShooterSubsystem getInstance() {
         if (instance == null) {
-            instance = new shooterSubsystem();
+            instance = new ShooterSubsystem();
         }
         return instance;
     }
 
-    public shooterSubsystem subsystem() {
+    public static ShooterSubsystem subsystem() {
         return getInstance();
     }
 
-    public shooterSubsystem() {
+    public ShooterSubsystem() {
         shooterMotor.getConfigurator().apply(shooterConfig.config());
     }
 
@@ -62,8 +67,8 @@ public class shooterSubsystem extends Subsystem {
     }
 
     private double setVoltage() {
-        double x = robotPos.getX();
-        double y = robotPos.getY();
+        double x = robotPos.getX() - targetPos.getX();
+        double y = robotPos.getY() - targetPos.getY();
         double hypot = Math.hypot(x, y);
         return shooterConstants.shooterVOLTMap().get(hypot);
     }
@@ -73,6 +78,7 @@ public class shooterSubsystem extends Subsystem {
     }
 
     private void shooterIMethods() {
+        setTeamTranslations();
         setMotor(setVoltage());
     }
 
@@ -82,6 +88,16 @@ public class shooterSubsystem extends Subsystem {
 
     private void shooterEMethods() {
         setMotor(0);
+    }
+
+    private void setTeamTranslations() {
+        Alliance alliance = DriverStation.getAlliance().orElse(Alliance.Blue);
+
+        if (alliance == Alliance.Red) {
+            targetPos = elevatorConstants.Blue_target;
+        } else {
+            targetPos = elevatorConstants.Red_target;
+        }
     }
 
 }

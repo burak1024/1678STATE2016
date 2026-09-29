@@ -1,5 +1,6 @@
 package frc.robot.Subsystems.Elevator;
 
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.interpolation.InterpolatingDoubleTreeMap;
 
 public class elevatorConstants {
@@ -10,8 +11,16 @@ public class elevatorConstants {
         treeMap.put(4.0, 4.0);
         return treeMap;
     }
+    public static InterpolatingDoubleTreeMap heightMap(){
+        InterpolatingDoubleTreeMap treeMap = new InterpolatingDoubleTreeMap();
+        treeMap.put(0.0, 0.0);
+        treeMap.put(1.0, 1.0);
+        treeMap.put(4.0, 4.0);
+        return treeMap;
+    }
 public static int ELEVATOR_MOTOR1_ID=8;
 public static int ELEVATOR_MOTOR2_ID=9;
+public static int ELEVATOR_MOTOR3_ID=15;
 public static final double STATOR_CURRENT_LIMIT = 80.0;
     public static final double CRUISE_VELOCITY = Double.POSITIVE_INFINITY;
     public static final double ACCELERATION = Double.POSITIVE_INFINITY;
@@ -22,4 +31,6 @@ public static final double STATOR_CURRENT_LIMIT = 80.0;
     public static final double kP=0.01;
     public static final double kI=0.01;
     public static final double kD = 0.01;
+    public static final Translation2d Blue_target=new Translation2d(0.5,6.0);
+    public static final Translation2d Red_target=new Translation2d(17.5,6.0);
 }
