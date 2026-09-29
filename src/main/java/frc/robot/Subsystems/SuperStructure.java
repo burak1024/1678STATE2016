@@ -4,6 +4,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Subsystems.Elevator.ElevatorSubsystem;
 import frc.robot.Subsystems.Intake.IntakeSubsystem;
+import frc.robot.Subsystems.Shield.ShieldSubsystem;
 import frc.robot.Subsystems.Climb.ClimbSubsystem;
 import frc.robot.Subsystems.Shooter.ShooterSubsystem;
 
@@ -19,40 +20,52 @@ public class SuperStructure extends SubsystemBase {
 
     private final Runnable[] methods = {
             () -> idleIMethods(),
+            () -> shieldingIMethods(),
             () -> intakingIMethods(),
             () -> shootingIMethods(),
             () -> climbingIMethods(),
     };
 
     private void idleIMethods() {
-        changeSubsystemStates(IntakeSubsystem.state.idle, ElevatorSubsystem.state.idle, ShooterSubsystem.state.idle,ClimbSubsystem.state.idle);
+        changeSubsystemStates(IntakeSubsystem.state.idle, ElevatorSubsystem.state.idle, ShooterSubsystem.state.idle,
+                ClimbSubsystem.state.idle,ShieldSubsystem.state.idle);
+    }
+    private void shieldingIMethods(){
+        changeSubsystemStates(IntakeSubsystem.state.idle, ElevatorSubsystem.state.idle, ShooterSubsystem.state.idle, ClimbSubsystem.state.idle, ShieldSubsystem.state.shielding);;
     }
 
     private void intakingIMethods() {
-        changeSubsystemStates(IntakeSubsystem.state.intaking, ElevatorSubsystem.state.idle, ShooterSubsystem.state.idle,ClimbSubsystem.state.idle);
+        changeSubsystemStates(IntakeSubsystem.state.intaking, ElevatorSubsystem.state.idle, ShooterSubsystem.state.idle,
+                ClimbSubsystem.state.idle,ShieldSubsystem.state.shielding);
     }
-    private void shootingIMethods(){
-        changeSubsystemStates(IntakeSubsystem.state.idle, ElevatorSubsystem.state.shooting, ShooterSubsystem.state.shooting, ClimbSubsystem.state.idle);
+
+    private void shootingIMethods() {
+        changeSubsystemStates(IntakeSubsystem.state.idle, ElevatorSubsystem.state.shooting,
+                ShooterSubsystem.state.shooting, ClimbSubsystem.state.idle,ShieldSubsystem.state.idle);
     }
-    private void climbingIMethods(){
-        changeSubsystemStates(IntakeSubsystem.state.idle, ElevatorSubsystem.state.climb, ShooterSubsystem.state.idle, ClimbSubsystem.state.climbing);
+
+    private void climbingIMethods() {
+        changeSubsystemStates(IntakeSubsystem.state.idle, ElevatorSubsystem.state.climb, ShooterSubsystem.state.idle,
+                ClimbSubsystem.state.climbing,ShieldSubsystem.state.idle);
     }
 
     private void changeSubsystemStates(IntakeSubsystem.state intakeState, ElevatorSubsystem.state elevatorState,
-        ShooterSubsystem.state shooterState, ClimbSubsystem.state climbState) {
-        IntakeSubsystem.subsystem().changeState(intakeState) ; 
+            ShooterSubsystem.state shooterState, ClimbSubsystem.state climbState,ShieldSubsystem.state shieldState) {
+        IntakeSubsystem.subsystem().changeState(intakeState);
         ElevatorSubsystem.subsystem().changeState(elevatorState);
         ShooterSubsystem.getInstance().changeState(shooterState);
         ClimbSubsystem.subsystem().changeState(climbState);
+        ShieldSubsystem.subsystem().changeState(shieldState);
     }
 
     private state currentState = state.idle;
 
     public enum state {
         idle(0),
-        intaking(1),
-        shooting(2),
-        climbing(3);
+        shielding(1),
+        intaking(2),
+        shooting(3),
+        climbing(4);
 
         public final int stateNum;
 
@@ -73,6 +86,7 @@ public class SuperStructure extends SubsystemBase {
         ElevatorSubsystem.subsystem();
         ShooterSubsystem.subsystem();
         ClimbSubsystem.subsystem();
+        ShieldSubsystem.subsystem();
     }
 
     public void changeState(state newState) {

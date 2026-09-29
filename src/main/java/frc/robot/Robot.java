@@ -7,11 +7,14 @@ import com.ctre.phoenix6.swerve.SwerveRequest;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandPS4Controller;
 import frc.robot.Subsystems.CommandSwerveDrivetrain;
 import frc.robot.Subsystems.SuperStructure;
+import frc.robot.Subsystems.SuperStructure.state;
 import frc.robot.Subsystems.generated.TunerConstants;
 
 public class Robot extends TimedRobot {
@@ -29,7 +32,13 @@ public class Robot extends TimedRobot {
             .withVelocityX(-driver.getLeftY() * MaxSpeed)
             .withVelocityY(-driver.getLeftX() * MaxSpeed)
             .withRotationalRate(MathUtil.applyDeadband(-driver.getRightX(), 0.5) * MaxAngularRate)));
-
+    driver2.R2().whileTrue(new InstantCommand(() -> SuperStructure.getInstance().changeState(state.intaking)));
+    driver2.R1().onTrue(new InstantCommand(() -> SuperStructure.getInstance().changeState(state.climbing)));
+    driver2.L2().whileTrue(new InstantCommand(() -> SuperStructure.getInstance().changeState(state.shooting)));
+    driver2.povDown()
+        .onTrue(new InstantCommand(() -> SuperStructure.getInstance().changeState(SuperStructure.state.idle)))
+        .onFalse(new InstantCommand(() -> SuperStructure.getInstance().changeState(SuperStructure.state.idle)));
+    SmartDashboard.putData("Field", field);
   }
 
   @Override
