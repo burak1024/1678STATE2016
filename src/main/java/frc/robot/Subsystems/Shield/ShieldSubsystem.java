@@ -37,7 +37,7 @@ public class ShieldSubsystem extends Subsystem {
     public Runnable[][] methods = {
             {
                     () -> emptyMethod(),
-                    () -> emptyMethod(),
+                    () -> idlePMethods(),
                     () -> emptyMethod()
             },
             {
@@ -63,6 +63,9 @@ public class ShieldSubsystem extends Subsystem {
     }
 
     public void shieldingEMethods() {
+        shieldMotor.setControl(Motion.withPosition(0));
+    }
+    public void idlePMethods() {
         shieldMotor.setControl(Motion.withPosition(0));
     }
 }

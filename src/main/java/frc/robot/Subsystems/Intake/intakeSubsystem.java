@@ -42,7 +42,7 @@ public class IntakeSubsystem extends Subsystem {
     public Runnable[][] methods = {
             {
                     () -> emptyMethod(),
-                    () -> emptyMethod(),
+                    () -> idlePMethods(),
                     () -> emptyMethod()
             },
             {
@@ -72,5 +72,9 @@ public class IntakeSubsystem extends Subsystem {
     private void intakingEMethods() {
         intakeMotorL.setControl(Voltage.withOutput(3.0));
         intakeMotorR.setControl(Voltage.withOutput(3.0));
+    }
+    private void idlePMethods() {
+        intakeMotorL.setControl(Voltage.withOutput(0.0));
+        intakeMotorR.setControl(Voltage.withOutput(0.0));
     }
 }

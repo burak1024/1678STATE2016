@@ -5,9 +5,8 @@ import com.ctre.phoenix6.hardware.TalonFX;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import frc.robot.LimelightHelpers;
+import frc.robot.Subsystems.SuperStructure;
 import frc.robot.lib.Subsystem;
 
 public class ElevatorSubsystem extends Subsystem {
@@ -17,7 +16,6 @@ public class ElevatorSubsystem extends Subsystem {
     private final MotionMagicVoltage Motion = new MotionMagicVoltage(0).withEnableFOC(true);
     private Pose2d robotPos = LimelightHelpers.getBotPose2d("limelight");
     private static ElevatorSubsystem instance;
-    private Translation2d targetPos;
 
     public static ElevatorSubsystem getInstance() {
         if (instance == null) {
@@ -31,6 +29,7 @@ public class ElevatorSubsystem extends Subsystem {
     }
 
     public ElevatorSubsystem() {
+        SuperStructure.setTeamTranslations();
         elevatorMotor1.getConfigurator().apply(elevatorConfig.config());
         elevatorMotor2.getConfigurator().apply(elevatorConfig.config());
     }
@@ -52,7 +51,7 @@ public class ElevatorSubsystem extends Subsystem {
     public Runnable[][] methods = {
             {
                     () -> emptyMethod(),
-                    () -> emptyMethod(),
+                    () -> idlePMethods(),
                     () -> emptyMethod()
             },
             {
@@ -74,59 +73,46 @@ public class ElevatorSubsystem extends Subsystem {
         super.activeStatePeriodic = methods[newState.stateNum][1];
     }
 
-    private double setElevPosition() {
-        double x = robotPos.getX() - targetPos.getX();
-        double y = robotPos.getY() - targetPos.getY();
-        double hypot = Math.hypot(x, y);
-        return elevatorConstants.positionMap().get(hypot);
-    }
-
-    private double setElevHeightPosition() {
-        double x = robotPos.getX() - targetPos.getX();
-        double y = robotPos.getY() - targetPos.getY();
-        double hypot = Math.hypot(x, y);
-        return elevatorConstants.heightMap().get(hypot);
-    }
-
-    private void setElev(double Pos, double Height) {
+    private void setElevPosition() {
+        Translation2d robotpos = robotPos.getTranslation();
+        double Pos= elevatorConstants.positionMap().get(SuperStructure.targetPos.getDistance(robotpos));
+        double Height = elevatorConstants.heightMap().get(SuperStructure.targetPos.getDistance(robotpos));
         elevatorMotor1.setControl(Motion.withPosition(Pos));
         elevatorMotor2.setControl(Motion.withPosition(Pos));
         elevatorMotor3.setControl(Motion.withPosition(Height));
-    }
 
+    }
     private void climbIMethods() {
-        setElev(5.0, 5.0);
+        setElevPosition();
     }
 
     private void climbPMethods() {
-        setElev(5.0, 5.0);
+        setElevPosition();
     }
 
     private void climbEMethods() {
-        setElev(0.0, 5.0);
+        setElevPosition();
     }
 
     private void shootIMethods() {
-        setTeamTranslations();
-        setElev(setElevPosition(), setElevHeightPosition());
+        setElevPosition();
     }
 
     private void shootpMethods() {
-        setElev(setElevPosition(), setElevHeightPosition());
+        setElevPosition();
     }
 
     private void shootEMethods() {
-        setElev(0, 0);
+        setElevPosition();
+    }
+    private void idlePMethods(){
+        set0();
+    }
+    private void set0(){
+        elevatorMotor1.setControl(Motion.withPosition(0));
+        elevatorMotor2.setControl(Motion.withPosition(0));
+        elevatorMotor3.setControl(Motion.withPosition(0));
     }
 
-    private void setTeamTranslations() {
-        Alliance alliance = DriverStation.getAlliance().orElse(Alliance.Blue);
-
-        if (alliance == Alliance.Red) {
-            targetPos = elevatorConstants.Blue_target;
-        } else {
-            targetPos = elevatorConstants.Red_target;
-        }
-    }
 
 }

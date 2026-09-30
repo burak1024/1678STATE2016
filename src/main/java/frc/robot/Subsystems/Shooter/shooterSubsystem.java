@@ -5,10 +5,8 @@ import com.ctre.phoenix6.hardware.TalonFX;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import frc.robot.LimelightHelpers;
-import frc.robot.Subsystems.Elevator.elevatorConstants;
+import frc.robot.Subsystems.SuperStructure;
 import frc.robot.lib.Subsystem;
 
 public class ShooterSubsystem extends Subsystem {
@@ -16,7 +14,6 @@ public class ShooterSubsystem extends Subsystem {
     private final VoltageOut Voltage = new VoltageOut(0).withEnableFOC(true);
     private Pose2d robotPos = LimelightHelpers.getBotPose2d("limelight");
     private static ShooterSubsystem instance;
-    private Translation2d targetPos;
 
     public static ShooterSubsystem getInstance() {
         if (instance == null) {
@@ -30,6 +27,7 @@ public class ShooterSubsystem extends Subsystem {
     }
 
     public ShooterSubsystem() {
+        SuperStructure.setTeamTranslations();
         shooterMotor.getConfigurator().apply(shooterConfig.config());
     }
 
@@ -66,38 +64,23 @@ public class ShooterSubsystem extends Subsystem {
         super.activeStatePeriodic = methods[newState.stateNum][1];
     }
 
-    private double setVoltage() {
-        double x = robotPos.getX() - targetPos.getX();
-        double y = robotPos.getY() - targetPos.getY();
-        double hypot = Math.hypot(x, y);
-        return shooterConstants.shooterVOLTMap().get(hypot);
+    private void setMotor() {
+        Translation2d robotpos = robotPos.getTranslation();
+        double z =shooterConstants.shooterVOLTMap().get(SuperStructure.targetPos.getDistance(robotpos));
+        shooterMotor.setControl(Voltage.withOutput(z));
     }
 
-    private void setMotor(double voltage) {
-        shooterMotor.setControl(Voltage.withOutput(voltage));
-    }
 
     private void shooterIMethods() {
-        setTeamTranslations();
-        setMotor(setVoltage());
+        setMotor();
     }
 
     private void shooterPMethods() {
-        setMotor(setVoltage());
+        setMotor();
     }
 
     private void shooterEMethods() {
-        setMotor(0);
-    }
-
-    private void setTeamTranslations() {
-        Alliance alliance = DriverStation.getAlliance().orElse(Alliance.Blue);
-
-        if (alliance == Alliance.Red) {
-            targetPos = elevatorConstants.Blue_target;
-        } else {
-            targetPos = elevatorConstants.Red_target;
-        }
+        setMotor();
     }
 
 }

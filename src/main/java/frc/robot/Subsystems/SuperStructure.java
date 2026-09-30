@@ -1,8 +1,12 @@
 package frc.robot.Subsystems;
 
+import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Subsystems.Elevator.ElevatorSubsystem;
+import frc.robot.Subsystems.Elevator.elevatorConstants;
 import frc.robot.Subsystems.Intake.IntakeSubsystem;
 import frc.robot.Subsystems.Shield.ShieldSubsystem;
 import frc.robot.Subsystems.Climb.ClimbSubsystem;
@@ -10,7 +14,7 @@ import frc.robot.Subsystems.Shooter.ShooterSubsystem;
 
 public class SuperStructure extends SubsystemBase {
     private static SuperStructure instance;
-
+    public static Translation2d targetPos;
     public static SuperStructure getInstance() {
         if (instance == null) {
             instance = new SuperStructure();
@@ -95,6 +99,15 @@ public class SuperStructure extends SubsystemBase {
         currentState = newState;
         methods[currentState.stateNum].run();
         SmartDashboard.putNumber("ActiveState", currentState.stateNum);
+    }
+    public static void setTeamTranslations() {
+        Alliance alliance = DriverStation.getAlliance().orElse(Alliance.Blue);
+
+        if (alliance == Alliance.Red) {
+            targetPos = elevatorConstants.Blue_target;
+        } else {
+            targetPos = elevatorConstants.Red_target;
+        }
     }
 
 }
