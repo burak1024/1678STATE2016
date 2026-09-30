@@ -40,7 +40,7 @@ public class ClimbSubsystem extends Subsystem {
             },
             {
                     () -> climbingIMethods(),
-                    () -> climbingPMethods(),
+                    () -> emptyMethod(),
                     () -> climbingEMethods()
             }
     };
@@ -55,11 +55,6 @@ public class ClimbSubsystem extends Subsystem {
     private void climbingIMethods() {
         solenoid.set(true);
     }
-
-    private void climbingPMethods() {
-        solenoid.set(true);
-    }
-
     private void climbingEMethods() {
         solenoid.set(false);
     }
